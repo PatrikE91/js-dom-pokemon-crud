@@ -7,14 +7,17 @@ function addPokemon(pokemon) {
   const imgEl = document.createElement("img");
   const h2El = document.createElement("h2");
   const deleteButton = document.createElement("button");
-  const likeButton = document.createElement('button')
+  const likeButton = document.createElement("button");
+  likeButton.innerText =
+    pokemon.preference === true
+      ? "Do you like it? Yes!"
+      : "Do you like it? No!";
 
   liEl.classList.add("pokemon");
-  
+
   imgEl.src = pokemon.image;
   h2El.innerText = pokemon.name;
   deleteButton.innerText = "Delete";
-  likeButton.innerText = 'Do you like it?'
 
   deleteButton.addEventListener("click", (e) => {
     e.preventDefault();
@@ -26,8 +29,44 @@ function addPokemon(pokemon) {
         return response.json();
       })
       .then(function (pokemons) {
-        addPokemon(pokemons)
+        addPokemon(pokemons);
       });
+  });
+
+  likeButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    
+    if (pokemon.preference === true) {
+      likeButton.innerText = "Do you like it? Yes!";
+      fetch(url + pokemon.id, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ preference: false }),
+      })
+        .then(function (response) {
+          return response.json();
+        })
+        .then((pokemon) => {
+          console.log(pokemon);
+        });
+    } else {
+      likeButton.innerText = "Do you like it? No!";
+      fetch(url + pokemon.id, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ preference: true }),
+      })
+        .then(function (response) {
+          return response.json();
+        })
+        .then((pokemon) => {
+          console.log(pokemon);
+        });
+    }
   });
 
   liEl.append(imgEl, h2El, deleteButton, likeButton);
@@ -44,6 +83,7 @@ function listenToAddPokemonForm() {
     const pokemon = {
       name: pokeForm.name.value,
       image: pokeForm.image.value,
+      preference: true,
     };
 
     // CREATE

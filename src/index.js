@@ -25,11 +25,10 @@ function addPokemon(pokemon) {
     fetch(url + pokemon.id, {
       method: "DELETE",
     })
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (pokemons) {
-        addPokemon(pokemons);
+      .then(response => response.json())
+      .then(pokemons => {
+        pokeList.innerHTML = "";
+        readAsync(pokemons);
       });
   });
 
@@ -45,11 +44,10 @@ function addPokemon(pokemon) {
         },
         body: JSON.stringify({ preference: false }),
       })
-        .then(function (response) {
-          return response.json();
-        })
+        .then(response => response.json())
         .then((pokemon) => {
-          console.log(pokemon);
+          pokeList.innerHTML = "";
+          readAsync(pokemon);
         });
     } else {
       likeButton.innerText = "Do you like it? No!";
@@ -60,11 +58,10 @@ function addPokemon(pokemon) {
         },
         body: JSON.stringify({ preference: true }),
       })
-        .then(function (response) {
-          return response.json();
-        })
+        .then(response => response.json())
         .then((pokemon) => {
-          console.log(pokemon);
+          pokeList.innerHTML = "";
+          readAsync(pokemon);
         });
     }
   });
@@ -103,15 +100,24 @@ function listenToAddPokemonForm() {
 
 // READ
 
-function read() {
-  fetch(url)
-    .then((res) => res.json())
-    .then((pokemons) => addPokemons(pokemons));
+// function read() {
+//   fetch(url)
+//     .then((res) => res.json())
+//     .then((pokemons) => addPokemons(pokemons));
+// }
+
+async function readAsync() {
+  let response = await fetch(url);
+  let json = await response.json();
+  addPokemons(json)
 }
+
 
 function init() {
   listenToAddPokemonForm();
-  read();
+  readAsync()
+  .then(result => console.log(result))
+  .catch(err => console.error(err))
 }
 
 init();
